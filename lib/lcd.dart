@@ -11,7 +11,7 @@ class Chip8Painter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()..color = Colors.red;
+    final Paint paint = Paint()..color = Colors.black;
 
     for (int y = 0; y < screenHeight; y++) {
       for (int x = 0; x < screenWidth; x++) {
@@ -23,6 +23,7 @@ class Chip8Painter extends CustomPainter {
             pixelSize,
           );
           canvas.drawRect(pixelRect, paint);
+          // print("Drawing pixel at ($x, $y)");
         }
       }
     }

@@ -16,6 +16,9 @@ class Chip8ScreenState extends State<Chip8Screen> {
   final int screenWidth = 64;
   final int screenHeight = 32;
   final double pixelSize = 5.0;
+
+  int cyclesPerFrame = 80; // Adjust based on performance needs
+
   bool isRomLoaded = false;
 
   @override
@@ -36,11 +39,11 @@ class Chip8ScreenState extends State<Chip8Screen> {
   }
 
   Future<void> _startEmulation() async {
-    // Emulation loop that runs at ~60Hz
     while (isRomLoaded && mounted) {
-      setState(() {
+      for (int i = 0; i < cyclesPerFrame; i++) {
         widget.chip8.emulateCycle();
-      });
+      }
+      setState(() {});
       await Future.delayed(const Duration(milliseconds: 16));
     }
   }
