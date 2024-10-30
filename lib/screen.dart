@@ -15,7 +15,7 @@ class Chip8Screen extends StatefulWidget {
 class Chip8ScreenState extends State<Chip8Screen> {
   final int screenWidth = 64;
   final int screenHeight = 32;
-  final double pixelSize = 10.0;
+  final double pixelSize = 5.0;
   bool isRomLoaded = false;
 
   @override
@@ -30,7 +30,6 @@ class Chip8ScreenState extends State<Chip8Screen> {
             ((x % 2 == 0) && (y % 2 == 0)) ? 1 : 0;
       }
     }
-    print("Test Pattern Display Array: ${widget.chip8.display}");
     setState(() {
       isRomLoaded = true;
     });
@@ -86,24 +85,21 @@ class Chip8ScreenState extends State<Chip8Screen> {
             ),
             const SizedBox(height: 20),
             if (isRomLoaded)
-              Container(
-                width: 640,
-                height: 320,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.blueAccent,
-                    width: 2,
-                  ), // Debug border
-                ),
-                child: CustomPaint(
-                  painter: Chip8Painter(
-                      widget.chip8.display, screenWidth, screenHeight, 15),
-                  child: Container(
-                    width:
-                        screenWidth * 10.0, // Width for 10px each (640px wide)
-                    height: screenHeight *
-                        10.0, // Height for 10px each (320px tall)
-                    color: Colors.black,
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: screenWidth * pixelSize,
+                  height: screenHeight * pixelSize,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blueAccent, width: 2),
+                  ),
+                  child: CustomPaint(
+                    painter: Chip8Painter(
+                      widget.chip8.display,
+                      screenWidth,
+                      screenHeight,
+                      pixelSize,
+                    ),
                   ),
                 ),
               )

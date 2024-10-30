@@ -11,12 +11,8 @@ class Chip8Painter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..style = PaintingStyle.fill
-      ..isAntiAlias = false
-      ..color = Colors.red;
+    final Paint paint = Paint()..color = Colors.red;
 
-    // Draw each pixel according to the display array with fixed pixelSize
     for (int y = 0; y < screenHeight; y++) {
       for (int x = 0; x < screenWidth; x++) {
         if (display[y * screenWidth + x] == 1) {
@@ -27,8 +23,6 @@ class Chip8Painter extends CustomPainter {
             pixelSize,
           );
           canvas.drawRect(pixelRect, paint);
-          print(
-              "Drawing red pixel at ($x, $y) with fixed size ($pixelSize, $pixelSize)");
         }
       }
     }
