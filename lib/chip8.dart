@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 class Chip8 {
   static const int memorySize = 4096;
@@ -21,11 +22,36 @@ class Chip8 {
   final List<int> display = List.filled(screenWidth * screenHeight, 0);
   int delayTimer = 0;
   int soundTimer = 0;
+  bool isRomLoaded = false;
 
   final List<bool> keys = List.filled(16, false);
 
   Chip8() {
     loadFonts();
+  }
+
+  Future<void> loadDebugRom(String path) async {
+    // Try loading the asset
+    ByteData romData = await rootBundle.load(path);
+
+    // If successful, proceed with loading ROM
+    Uint8List romBytes = romData.buffer.asUint8List();
+
+    for (int i = 0; i < romBytes.length; i++) {
+      memory[programStart + i] = romBytes[i];
+    }
+
+    if (romBytes.length + programStart > memory.length) {
+      throw Exception("ROM size exceeds available memory.");
+    }
+
+    for (int i = 0; i < romBytes.length; i++) {
+      memory[programStart + i] = romBytes[i];
+    }
+
+    if (kDebugMode) {
+      print("ROM loaded successfully!");
+    }
   }
 
   Future<void> loadRom() async {
@@ -49,6 +75,19 @@ class Chip8 {
         print("ROM loaded successfully!");
       }
     }
+  }
+
+  void reset() {
+    memory.fillRange(0, memory.length, 0);
+    v.fillRange(0, v.length, 0);
+    i = 0;
+    pc = programStart;
+    stack.fillRange(0, stack.length, 0);
+    sp = 0;
+    display.fillRange(0, display.length, 0);
+    delayTimer = 0;
+    soundTimer = 0;
+    isRomLoaded = false;
   }
 
   FutureOr<void> loadFonts() async {

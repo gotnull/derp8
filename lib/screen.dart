@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'chip8.dart';
 import 'lcd.dart';
 
@@ -19,8 +21,6 @@ class Chip8ScreenState extends State<Chip8Screen> {
 
   int cyclesPerFrame = 80; // Adjust based on performance needs
 
-  bool isRomLoaded = false;
-
   @override
   void initState() {
     super.initState();
@@ -34,12 +34,12 @@ class Chip8ScreenState extends State<Chip8Screen> {
       }
     }
     setState(() {
-      isRomLoaded = true;
+      widget.chip8.isRomLoaded = true;
     });
   }
 
   Future<void> _startEmulation() async {
-    while (isRomLoaded && mounted) {
+    while (widget.chip8.isRomLoaded && mounted) {
       for (int i = 0; i < cyclesPerFrame; i++) {
         widget.chip8.emulateCycle();
       }
@@ -49,19 +49,39 @@ class Chip8ScreenState extends State<Chip8Screen> {
   }
 
   Future<void> _loadRomAndStartEmulation() async {
-    await widget.chip8.loadRom(); // Load the ROM
+    await widget.chip8.loadRom(); // Load the ROM using file picker
 
     if (mounted) {
       setState(() {
-        isRomLoaded = true;
+        widget.chip8.isRomLoaded = true;
       });
       _startEmulation(); // Start the emulation loop
     }
   }
 
+  Future<void> _loadDebugRom() async {
+    await widget.chip8.loadDebugRom(
+      "assets/roms/octopeg.ch8",
+    );
+
+    if (mounted) {
+      setState(() {
+        widget.chip8.isRomLoaded = true;
+      });
+      _startEmulation(); // Start the emulation loop
+    }
+  }
+
+  void _resetEmulator() {
+    setState(() {
+      widget.chip8.reset(); // Assuming a reset method in your Chip8 class
+      widget.chip8.isRomLoaded = false;
+    });
+  }
+
   @override
   void dispose() {
-    isRomLoaded = false; // Stop emulation loop
+    widget.chip8.isRomLoaded = false; // Stop emulation loop
     super.dispose();
   }
 
@@ -82,19 +102,33 @@ class Chip8ScreenState extends State<Chip8Screen> {
             ElevatedButton(
               onPressed: _loadRomAndStartEmulation,
               child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
                 child: Text("Load ROM"),
               ),
             ),
+            ElevatedButton(
+              onPressed: _loadDebugRom,
+              child: const Text("Debug ROM"),
+            ),
+            ElevatedButton(
+              onPressed: _resetEmulator,
+              child: const Text("Reset"),
+            ),
             const SizedBox(height: 20),
-            if (isRomLoaded)
+            if (widget.chip8.isRomLoaded)
               Align(
                 alignment: Alignment.center,
                 child: Container(
                   width: screenWidth * pixelSize,
                   height: screenHeight * pixelSize,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blueAccent, width: 2),
+                    border: Border.all(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
                   ),
                   child: CustomPaint(
                     painter: Chip8Painter(
