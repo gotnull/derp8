@@ -37,10 +37,6 @@ class Chip8 {
     // If successful, proceed with loading ROM
     Uint8List romBytes = romData.buffer.asUint8List();
 
-    for (int i = 0; i < romBytes.length; i++) {
-      memory[programStart + i] = romBytes[i];
-    }
-
     if (romBytes.length + programStart > memory.length) {
       throw Exception("ROM size exceeds available memory.");
     }
@@ -251,7 +247,9 @@ class Chip8 {
             if ((pixel & (0x80 >> xLine)) != 0) {
               int index = ((y + yLine) % screenHeight) * screenWidth +
                   ((x + xLine) % screenWidth);
-              if (display[index] == 1) v[0xF] = 1;
+              if (display[index] == 1) {
+                v[0xF] = 1;
+              }
               display[index] ^= 1;
 
               // Debug output for each pixel
